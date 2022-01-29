@@ -30,11 +30,46 @@ const  newsButton = document.getElementsByClassName("news")
 const objectsToUpdate = []
 // Create sphere
 const sphereGeometry = new THREE.SphereGeometry(1, 8, 8)
-/**
- * Sizes
- * 
- * 
- */
+//global variables
+let intersects=null
+let dance="off"
+let singleSet = null
+let tableCloth = null
+let mixer = null
+let teaset = null
+let singleCup= null
+let singlePlate = null
+let singleGroup = null
+let cups ={
+    1:"",
+    2:"",
+    3:"",
+    4:"",
+    5:"",
+    6:"",
+}
+let plates ={
+    1:"",
+    2:"",
+    3:"",
+    4:"",
+    5:"",
+    6:"",
+}
+
+
+let teaSetTriggers={
+1:"on",
+2:"on",
+3:"on",
+4:"on",
+5:"on",
+6:"on",
+"rack":"on"
+
+}
+
+let singleSetDisplay = "off"
 
  const basicTexture = new THREE.MeshBasicMaterial({color:"blue"})
 
@@ -162,6 +197,11 @@ window.addEventListener('resize', () =>
 })
 
 
+const initializePlacingSet= function(cup, plate){
+    singleSetDisplay="on";
+    scene.remove(cup,plate);
+}
+
 
 const mouse = new THREE.Vector2()
 mouse.x = null
@@ -218,23 +258,7 @@ window.addEventListener('mousemove', (event) =>
 
 const gltfLoader = new GLTFLoader()
 // gltfLoader.setDRACOLoader(dracoLoader)
-let intersects=null
-let dance="off"
-let singleSet = null
-let tableCloth = null
-let mixer = null
-let mixer2 = null
-let satelites = null
-let teaset = null
-let head= null
-let globe = null
-let turnhead=null
-let walk = null
-let sateliteGroup=null
-let star=null
-let singleCup= null
-let singlePlate = null
-let singleGroup = null
+
 
 gltfLoader.load(
     '/notexture.glb',
@@ -397,7 +421,7 @@ const tick = () =>
         if(intersects.length>0){
             
             // console.log(intersects)
-            if(singleGroup!=null){
+            if(singleGroup!=null&&singleSetDisplay==="on"){
             scene.add(singleGroup)
             singleGroup.position.x=intersects[0].point.x
             singleGroup.position.y=.2
