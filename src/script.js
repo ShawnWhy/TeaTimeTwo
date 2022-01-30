@@ -14,6 +14,7 @@ const about = "<p>Shawn Is a person</p>"
 const contact = "<div><a href='mailto:shawnyudesign@gmail.com'>shawnyudesign@gmail.com</a></div>"
 const portfolio = '<div><ul><li><a href="https://shawnwhy.github.io/Cosmotree/">Cosmo Tree</a></li> <li><a href="https://shawnwhy.github.io/CloudySky/">Sky Over Berlin</a></li><li><a href="https://shawnwhy.github.io/CandieEater/">Diary of a Candy Eater</a></div>'
 const news = "<p>Under Construction</p>"
+const links = "<p>links</p><ul><li>link</li><li>link</li><li>link</li></ul>"
 const textureLoader = new THREE.TextureLoader()
 var audioCup = new Audio('/mug.wav');
 var audioClick = new Audio('/click.wav');
@@ -65,13 +66,14 @@ let teaSetTriggers={
 4:"on",
 5:"on",
 6:"on",
-"rack":"on"
-
 }
 
 const quotes = [
-    "Words bounce. Words, if you let them, will do what they want to do and what they have to do.",
-    
+    "Words bounce. Words, if you let them, will do what they want to do and what they have to do.- Anne Carson",
+"To be running breathlessly, but not yet arrived, is itself delightful, a suspended moment of living hope. - Anne Carson",
+"As Sokrates tells it, your story begins the moment Eros enters you. That incursion is the biggest risk of your life. How you handle it is an index of the quality, wisdom, and decorum of the things inside you. As you handle it you come into contact with what is inside you, in a sudden and startling way. You perceive what you are, what you lack, what you could be.-Anne Carson",
+"For centuries poets, some poets, have tried to give a voice to the animals, and readers, some readers, have felt empathy and sorrow. If animals did have voices, and they could speak with the tongues of angels--at the very least with the tongues of angels--they would be unable to save themselves from us. What good would language do? Their mysterious otherness has not saved them, nor have their beautiful songs and coats and skins and shells and eyes. We discover the remarkable intelligence of the whale, the wolf, the elephant--it does not save them, nor does our awareness of the complexity of their lives. Their strength, their skills, their swiftness, the beauty of their flights. It matters not, it seems, whether they are large or small, proud or shy, docile or fierce, wild or domesticated, whether they nurse their young or brood patiently on eggs. If they eat meat, we decry their viciousness; if they eat grasses and seeds, we dismiss them as weak. There is not one of them, not even the songbird who cannot, who does not, conflict with man and his perceived needs and desires. St. Francis converted the wolf of Gubbio to reason, but he performed this miracle only once and as miracles go, it didn’t seem to capture the public’s fancy. Humans don’t want animals to reason with them. It would be a disturbing, unnerving, diminishing experience; it would bring about all manner of awkwardness and guilt.― Joy Williams",
+"Wouldn't it be wonderful if I won a helicopter in a crossword puzzle competition? There is not much hope though I am afraid, as they never give such practical prizes.-Leonora Carrington"  
 
 ]
 
@@ -207,6 +209,17 @@ const initializePlacingSet= function(cup, plate){
     singleSetDisplay="on";
     scene.remove(cup,plate);
 }
+const placeSingleSetProper = function(number){
+
+teaSetTriggers[number]="off"
+
+
+
+
+}
+
+
+
 
 
 const mouse = new THREE.Vector2()
@@ -237,7 +250,8 @@ $(".button").click((e)=>{
             $(".display").html(news)
             break;
             case "random_quotes":
-            $(".random_quotes").html(quotes)
+            random = Math.floor(Math.random()*3)
+            $(".random_quotes").html(quotes[random])
             break;
             case "links":
             $(".links").html(links)
@@ -407,7 +421,12 @@ const raycaster = new THREE.Raycaster()
 
 $(window).click(()=>{
     if(intersects.length>0){
+        if(play==="on"){
         createSingleSet()
+        }
+    else if(placeProper==="on"){
+    placeSingleSetProper(number)
+    }
 
     }
   
