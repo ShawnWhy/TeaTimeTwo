@@ -69,6 +69,12 @@ let teaSetTriggers={
 
 }
 
+const quotes = [
+    "Words bounce. Words, if you let them, will do what they want to do and what they have to do.",
+    
+
+]
+
 let singleSetDisplay = "off"
 
  const basicTexture = new THREE.MeshBasicMaterial({color:"blue"})
@@ -212,6 +218,8 @@ $(".button").click((e)=>{
     e.preventDefault();
     e.stopPropagation();
 
+    if(teaSetTriggers[1] ==="off"&&teaSetTriggers[2]==="off"&&teaSetTriggers[3]==="off"&&teaSetTriggers[4]==="off"&&teaSetTriggers[5]==="off"&&teaSetTriggers[6]==="off"){
+
     $(".monitor").removeClass("invisibleP")
     $(".menue").addClass("invisibleP")
     var ButtonName = $(e.target).attr("name")
@@ -226,9 +234,16 @@ $(".button").click((e)=>{
             $(".display").html(about)
             break;
             case "news":
-                $(".display").html(news)
-                break;
+            $(".display").html(news)
+            break;
+            case "random_quotes":
+            $(".random_quotes").html(quotes)
+            break;
+            case "links":
+            $(".links").html(links)
+            break;
     }
+}
 })
 
 $(".xButton").click((e)=>{
