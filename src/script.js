@@ -8,6 +8,11 @@ import {SphereGeometry, TextureLoader , CubeTextureLoader} from 'three'
 import CANNON from 'cannon'
 import $ from "./Jquery"
 import gsap from "gsap";
+import {createSingleSet, createSingleSetProper} from './createSingleSet.js'
+// import createSinglesetProper from './createSingleSet.js'
+
+console.log(createSingleSetProper);
+
 // import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 // import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 const about = "<p>Shawn Is a person</p>"
@@ -41,6 +46,8 @@ let teaset = null
 let singleCup= null
 let singlePlate = null
 let singleGroup = null
+let play = "off"
+
 let cups ={
     1:"",
     2:"",
@@ -68,6 +75,12 @@ let teaSetTriggers={
 6:"on",
 }
 
+let currentTrigger = null 
+
+let singleSetDisplay = "off"
+
+let createSinglesetProperTrigger = "off"
+
 const quotes = [
     "Words bounce. Words, if you let them, will do what they want to do and what they have to do.- Anne Carson",
 "To be running breathlessly, but not yet arrived, is itself delightful, a suspended moment of living hope. - Anne Carson",
@@ -77,7 +90,6 @@ const quotes = [
 
 ]
 
-let singleSetDisplay = "off"
 
  const basicTexture = new THREE.MeshBasicMaterial({color:"blue"})
 
@@ -98,62 +110,13 @@ let singleSetDisplay = "off"
  )
  world.addContactMaterial(defaultContactMaterial)
 
-const createSingleSet = function(){
-    const cupbow = new CANNON.Cylinder(.14,.1,.14,8)
-    const plateDrop = new CANNON.Cylinder(.3,.15,.05,8)
 
-    const cupHandle = new CANNON.Cylinder(.1,.1,.01,8)
-    // cupHandle.quaternion.setClearColor(new CANNON.Vec3())
-    
-    const cupbody = new CANNON.Body({mass:1})
-    const platebody = new CANNON.Body({mass:1})
-    cupbody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1,0,0),Math.PI *0.5)
-    platebody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1,0,0),Math.PI *0.5)
-    cupbody.position=new CANNON.Vec3(intersects[0].point.x, 1, intersects[0].point.z)
-    platebody.position=new CANNON.Vec3(intersects[0].point.x, .9, intersects[0].point.z)
-
-    cupbody.material=defaultMaterial;
-    cupbody.addShape(cupbow,new CANNON.Vec3(0,0,0))
-    cupbody.addShape(cupHandle,new CANNON.Vec3(.115,0,0))
-    platebody.addShape(plateDrop,new CANNON.Vec3(0,0,0))
-
-    // cupbody.addShape(cupHandle,new CANNON.Vec3(-.5,0,0),new CANNON.Quaternion(Math.PI*2,0,0))
-
-    const cupbowFakeGeo = new THREE.CylinderGeometry(.14,.1,.14,8,3,false,0,Math.PI*2)
-    const cuphandleFakeGeo = new THREE.CylinderGeometry(.1,.1,.01,8,2,false,0,Math.PI*2)
-    const plateFakeGeo = new THREE.CylinderGeometry(.3,.15,.05,8,3,false,0,Math.PI*2)
-
-    const singleplateMesh = new THREE.Mesh(plateFakeGeo, plateMaterial2)
-    const handleBowMesh = new THREE.Mesh(cuphandleFakeGeo, plateMaterial2)
-    handleBowMesh.position.x =-.115
-
-    const singleFakeCup = new THREE.Group()
-    singleplateMesh.rotation.x =  Math.PI * 0.5
-    const singleCup= singleGroup.children[1].clone()
-    const newsingleplate= singleGroup.children[0].clone()
-    newsingleplate.rotation.x =  Math.PI * 0.5
-
-    singleCup.rotation.x +=  Math.PI * 0.5
-    // singleCup.position.x -=.2
-    singleFakeCup.add(singleCup)
-    const plateMesh = new THREE.Group();
-    plateMesh.add(newsingleplate)
-    // console.log(singleGroup)
-
-    world.add(platebody)
-    scene.add(plateMesh)
-    world.addBody(cupbody)
-    scene.add(singleFakeCup)
-    objectsToUpdate.push({singleFakeCup,cupbody,plateMesh,platebody})
-    
-
-}
 
  //physics floor
 const floorShape = new CANNON.Plane()
 const floorBody = new CANNON.Body()
 floorBody.mass = 0
-floorBody.position=new CANNON.Vec3(0, .1, 0)
+floorBody.position=new CANNON.Vec3(0, -1.9, 0)
 floorBody.quaternion.setFromAxisAngle(
     new CANNON.Vec3(-1,0,0),
     Math.PI *0.5
@@ -213,7 +176,7 @@ const placeSingleSetProper = function(number){
 
 teaSetTriggers[number]="off"
 
-
+// createSinglesetProper()
 
 
 }
@@ -257,7 +220,15 @@ $(".button").click((e)=>{
             $(".links").html(links)
             break;
     }
+
+  
 }
+else{
+
+    createSinglesetProperTrigger="on"
+    currentTrigger = $(e.target).attr("name")
+}
+
 })
 
 $(".xButton").click((e)=>{
@@ -268,9 +239,31 @@ $(".xButton").click((e)=>{
 })
 
 $(".play").click((e)=>{  
+    $(".stop").removeClass("invisibleP")
+    $(".play").addClass("invisibleP")
+    e.preventDefault();
+    e.stopPropagation();
+    play = "on"
+    singleSetDisplay="on"
+
 
 })
 $(".stop").click((e)=>{
+    $(".play").removeClass("invisibleP")
+    $(".stop").addClass("invisibleP")
+    e.preventDefault();
+    e.stopPropagation();
+    play = "off"
+    singleSetDisplay = "off"
+    
+    objectsToUpdate.forEach(element => {
+        scene.remove(element.plateMesh, element.singleFakeCup);
+        world.remove(element.platebody,element.cupbody)
+        
+        
+    });
+
+
 
 })
 window.addEventListener('mousemove', (event) =>
@@ -290,12 +283,12 @@ const gltfLoader = new GLTFLoader()
 
 
 gltfLoader.load(
-    '/notexture.glb',
+    '/tableandcloth.glb',
     (gltf) =>
     {
         tableCloth=gltf.scene
-        tableCloth.children[0].material = plateMaterial
-        tableCloth.children[1].material = plateMaterial
+        // tableCloth.children[0].material = plateMaterial
+        // tableCloth.children[1].material = plateMaterial
         scene.add(tableCloth)
   
     }
@@ -305,8 +298,7 @@ gltfLoader.load(
 gltfLoader.load(
     '/singleset.glb',
     (gltf) =>
-    {
-        
+    {       
         singleSet=gltf.scene
         singleCup=singleSet.children[0]
         singlePlate= singleSet.children[1]
@@ -422,24 +414,36 @@ const raycaster = new THREE.Raycaster()
 $(window).click(()=>{
     if(intersects.length>0){
         if(play==="on"){
-        createSingleSet()
+        createSingleSet(CANNON, THREE, intersects,defaultMaterial, singleGroup,scene, world, objectsToUpdate)
         }
-    else if(placeProper==="on"){
-    placeSingleSetProper(number)
-    }
+        else if(createSinglesetProperTrigger==="on"){
+        createSingleSetProper(CANNON, THREE, intersects,defaultMaterial, singleGroup,scene, world, objectsToUpdate)
+        }
 
     }
   
     
 })
 var clothToTravel = []
-const plateGeometry = new THREE.CylinderGeometry(1,4,.1,4,4,false,4,4)
+const tableGeo = new CANNON.Box(new CANNON.Vec3(1.75,.05,.9))
+const tablebody = new CANNON.Body({mass:0})
+tablebody.addShape(tableGeo,new CANNON.Vec3(0,.02,0));
+tablebody.material=defaultMaterial;
+// tablebody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1,0,0),Math.PI *0.5)
+
+// const tableGeometry = new THREE.BoxGeometry(3.5,.1,1.8)
 const plateMaterial = new THREE.MeshBasicMaterial({color:'red'})
 const plateMaterial2 = new THREE.MeshBasicMaterial({color:'yellow'})
+// const tableMesh = new THREE.Mesh(tableGeometry, plateMaterial2)
+// tableMesh.position.y+=.05
 
-const plate = new THREE.Mesh(plateGeometry, plateMaterial)
-plate.position.y+=2;
-scene.add(plate)
+world.add(tablebody)
+// tableMesh.rotation.x =  Math.PI * 0.5
+// const tableGroup = new THREE.Group()
+// tableGroup.add(tableMesh)
+// scene.add(tableGroup)
+// tableGroup.position.copy(tablebody.position)
+// tableGroup.quaternion.copy(tablebody.quaternion)
 // clothToTravel.push(plate)
 
 
@@ -491,7 +495,8 @@ const tick = () =>
     controls.update()
     renderer.render(scene, camera)
     // effectComposer.render(scene, camera)
-
+    // tableGroup.position.copy(tablebody.position)
+    // tableGroup.quaternion.copy(tablebody.quaternion)
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 }
