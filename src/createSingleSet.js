@@ -30,11 +30,15 @@
         newsingleplate.position.z+=.03
     
         singleCup.rotation.x +=  Math.PI * 0.5
-        singleCup.position.z +=.02
+        singleCup.position.z +=.01
+        singleCup.position.y-=.07;
         singleFakeCup.add(singleCup)
         const plateMesh = new THREE.Group();
         plateMesh.add(newsingleplate)
         // console.log(singleGroup)
+        cupbody.sleepSpeedLimit = 1.0;
+        platebody.sleepSpeedLimit = 1.0;
+
     
         world.add(platebody)
         scene.add(plateMesh)
@@ -57,8 +61,8 @@
         const platebody = new CANNON.Body({mass:1})
         cupbody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1,0,0),Math.PI *0.5)
         platebody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1,0,0),Math.PI *0.5)
-        cupbody.position=new CANNON.Vec3(intersects[0].point.x, .2, intersects[0].point.z)
-        platebody.position=new CANNON.Vec3(intersects[0].point.x, .1, intersects[0].point.z)
+        cupbody.position=new CANNON.Vec3(intersects[0].point.x, .3, intersects[0].point.z)
+        platebody.position=new CANNON.Vec3(intersects[0].point.x, .2, intersects[0].point.z)
     
         cupbody.material=defaultMaterial;
         cupbody.addShape(cupbow,new CANNON.Vec3(0,0,0))
@@ -70,14 +74,17 @@
         const singleCup= singleGroup.children[1].clone()
         const newsingleplate= singleGroup.children[0].clone()
         newsingleplate.rotation.x =  Math.PI * 0.5
-        newsingleplate.position.z+=.05
+        newsingleplate.position.z+=.01
     
         singleCup.rotation.x +=  Math.PI * 0.5
-        singleCup.position.z +=.02
+        // singleCup.position.z +=.01
+        singleCup.position.y-=.07;
         singleFakeCup.add(singleCup)
         const plateMesh = new THREE.Group();
         plateMesh.add(newsingleplate)
         // console.log(singleGroup)
+        cupbody.sleepSpeedLimit = 1.0;
+        platebody.sleepSpeedLimit = 1.0;
     
         world.add(platebody)
         scene.add(plateMesh)

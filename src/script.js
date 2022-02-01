@@ -13,6 +13,7 @@ import {createSingleSet, createSingleSetProper} from './createSingleSet.js'
 
 console.log(createSingleSetProper);
 
+
 // import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 // import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 const about = "<p>Shawn Is a person</p>"
@@ -21,6 +22,12 @@ const portfolio = '<div><ul><li><a href="https://shawnwhy.github.io/Cosmotree/">
 const news = "<p>Under Construction</p>"
 const links = "<p>links</p><ul><li>link</li><li>link</li><li>link</li></ul>"
 const textureLoader = new THREE.TextureLoader()
+const floorTexture = textureLoader.load('/checker1.jpg')
+floorTexture.repeat.set(6,6)
+floorTexture.wrapT = THREE.MirroredRepeatWrapping
+floorTexture.wrapS = THREE.MirroredRepeatWrapping
+
+const floorMaterial = new THREE.MeshBasicMaterial({map:floorTexture})
 var audioCup = new Audio('/mug.wav');
 var audioClick = new Audio('/click.wav');
 audioCup.volume=.5
@@ -75,6 +82,8 @@ let teaSetTriggers={
 6:"on",
 }
 
+
+
 let currentTrigger = null 
 
 let singleSetDisplay = "off"
@@ -104,12 +113,23 @@ const quotes = [
      defaultMaterial,
      defaultMaterial,
      {
-         friction: .3,
-         restitution: 0.001
+         friction: .6,
+         restitution: 0.01
      }
  )
  world.addContactMaterial(defaultContactMaterial)
 
+ const cupbow = new CANNON.Cylinder(.155,.1,.13,8)
+const plateDrop = new CANNON.Cylinder(.3,.15,.05,8)
+const cupHandle = new CANNON.Cylinder(.1,.1,.01,8)
+const cupbody = new CANNON.Body({mass:.2})
+const platebody = new CANNON.Body({mass:.2})
+cupbody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1,0,0),Math.PI *0.5)
+cupbody.material=defaultMaterial;
+cupbody.addShape(cupbow,new CANNON.Vec3(0,0,0))
+cupbody.addShape(cupHandle,new CANNON.Vec3(.115,0,0))
+cupbody.addShape(plateDrop,new CANNON.Vec3(0,0,0))
+world.addBody(cupbody)
 
 
  //physics floor
@@ -133,7 +153,7 @@ world.addBody(floorBody)
 
 const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 10),
- basicTexture
+ floorMaterial
 )
 floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
@@ -168,13 +188,18 @@ window.addEventListener('resize', () =>
 })
 
 
-const initializePlacingSet= function(cup, plate){
+const initializePlacingProper= function(cup, plate){
     singleSetDisplay="on";
-    scene.remove(cup,plate);
-}
+    createSinglesetProperTrigger="on"
+    cup.visible=false
+plate.visible=false}
 const placeSingleSetProper = function(number){
 
 teaSetTriggers[number]="off"
+singleSetDisplay="off";
+singleGroup.visible=false;
+$(".monitor").removeClass("invisibleP")
+$(".menue").addClass("invisibleP")
 
 // createSinglesetProper()
 
@@ -193,12 +218,14 @@ $(".button").click((e)=>{
     console.log("clock")
     e.preventDefault();
     e.stopPropagation();
+    
 
     if(teaSetTriggers[1] ==="off"&&teaSetTriggers[2]==="off"&&teaSetTriggers[3]==="off"&&teaSetTriggers[4]==="off"&&teaSetTriggers[5]==="off"&&teaSetTriggers[6]==="off"){
 
     $(".monitor").removeClass("invisibleP")
     $(".menue").addClass("invisibleP")
     var ButtonName = $(e.target).attr("name")
+    let random = Math.floor(Math.random()*quotes.length-1)
     switch(ButtonName){
         case "portfolio":
             $(".display").html(portfolio)
@@ -214,10 +241,10 @@ $(".button").click((e)=>{
             break;
             case "random_quotes":
             random = Math.floor(Math.random()*3)
-            $(".random_quotes").html(quotes[random])
+            $(".display").html(quotes[random])
             break;
             case "links":
-            $(".links").html(links)
+            $(".display").html(links)
             break;
     }
 
@@ -225,8 +252,85 @@ $(".button").click((e)=>{
 }
 else{
 
-    createSinglesetProperTrigger="on"
+    
     currentTrigger = $(e.target).attr("name")
+   
+    var ButtonName = $(e.target).attr("name")
+    let random = Math.floor(Math.random()*quotes.length-1)
+    switch(ButtonName){
+        case "portfolio":
+            if(teaSetTriggers[1]=="off"){
+                $(".display").html(portfolio)
+                $(".monitor").removeClass("invisibleP")
+                $(".menue").addClass("invisibleP")
+                }
+            else{
+            initializePlacingProper(plates[1],cups[1])
+            currentTrigger=1
+            $(".display").html(portfolio)
+            }
+            break;
+            case "contact":
+            if(teaSetTriggers[2]=="off"){
+                $(".display").html(contact)
+                $(".monitor").removeClass("invisibleP")
+                $(".menue").addClass("invisibleP")
+                }
+            else{
+            initializePlacingProper(plates[2],cups[2])
+            currentTrigger=2
+            $(".display").html(contact)
+            }
+            break;
+            case "about":
+            if(teaSetTriggers[3]=="off"){
+                $(".display").html(about)
+                $(".monitor").removeClass("invisibleP")
+                $(".menue").addClass("invisibleP")
+                }
+            else{
+            initializePlacingProper(plates[3],cups[3])
+            currentTrigger=3
+            $(".display").html(about)
+            }
+            break;
+            case "news":
+            if(teaSetTriggers[4]=="off"){
+                $(".display").html(news)
+                $(".monitor").removeClass("invisibleP")
+                $(".menue").addClass("invisibleP")
+                }
+            else{
+            initializePlacingProper(plates[4],cups[4])
+            currentTrigger=4
+            $(".display").html(news)
+            }
+            break;
+            case "random_quotes":
+            if(teaSetTriggers[5]=="off"){
+                $(".display").html(quotes[random])
+                $(".monitor").removeClass("invisibleP")
+                $(".menue").addClass("invisibleP")
+                }
+            else{
+            initializePlacingProper(plates[5],cups[5])
+            currentTrigger=5
+            $(".display").html(quotes[random])
+            }
+            break;
+            case "links":
+            if(teaSetTriggers[6]=="off"){
+                 $(".display").html(links)
+                 $(".monitor").removeClass("invisibleP")
+                 $(".menue").addClass("invisibleP")
+                 }
+                else{
+            initializePlacingProper(plates[6],cups[6])
+            currentTrigger=6
+            $(".display").html(links)
+                }
+            break;
+    }
 }
 
 })
@@ -243,8 +347,11 @@ $(".play").click((e)=>{
     $(".play").addClass("invisibleP")
     e.preventDefault();
     e.stopPropagation();
+    createSinglesetProperTrigger="off"
     play = "on"
     singleSetDisplay="on"
+    teaset.visible=false
+    $(".button").addClass("invisibleP")
 
 
 })
@@ -253,8 +360,11 @@ $(".stop").click((e)=>{
     $(".stop").addClass("invisibleP")
     e.preventDefault();
     e.stopPropagation();
+    $(".button").removeClass("invisibleP")
     play = "off"
     singleSetDisplay = "off"
+    teaset.visible=true
+    singleGroup.visible=false
     
     objectsToUpdate.forEach(element => {
         scene.remove(element.plateMesh, element.singleFakeCup);
@@ -302,12 +412,13 @@ gltfLoader.load(
         singleSet=gltf.scene
         singleCup=singleSet.children[0]
         singlePlate= singleSet.children[1]
+        singleCup.position.y+=.07;
         singleGroup=new THREE.Group();
         singleGroup.add(singlePlate,singleCup)
+        singleGroup.visible=false
+        scene.add(singleGroup)
 
-        // console.log(teaset)
-        // teaset.scale.set(0.25, 0.25, 0.25)
-        // scene.add(teaset)
+       
   
     }
 )
@@ -317,10 +428,21 @@ gltfLoader.load(
     (gltf) =>
     {
         teaset=gltf.scene
-        // console.log(teaset)
+        console.log(teaset)
         // teaset.scale.set(0.25, 0.25, 0.25)
+        cups[1]=teaset.children[4]
+        cups[2]=teaset.children[2]
+        cups[3]=teaset.children[3]
+        cups[4]=teaset.children[7]
+        cups[5]=teaset.children[5]
+        cups[6]=teaset.children[6]
+        plates[1]=teaset.children[13]
+        plates[2]=teaset.children[12]
+        plates[3]=teaset.children[10]
+        plates[4]=teaset.children[9]
+        plates[5]=teaset.children[8]
+        plates[6]=teaset.children[14] 
         scene.add(teaset)
-  
     }
 )
 const cubeTextureLoader = new THREE.CubeTextureLoader()
@@ -418,6 +540,13 @@ $(window).click(()=>{
         }
         else if(createSinglesetProperTrigger==="on"){
         createSingleSetProper(CANNON, THREE, intersects,defaultMaterial, singleGroup,scene, world, objectsToUpdate)
+        createSinglesetProperTrigger="off"
+        singleSetDisplay="off"
+        singleGroup.visible=false
+        $(".menue").addClass("invisibleP")
+        $(".monitor").removeClass("invisibleP")
+        teaSetTriggers[currentTrigger]="off"
+        
         }
 
     }
@@ -427,7 +556,7 @@ $(window).click(()=>{
 var clothToTravel = []
 const tableGeo = new CANNON.Box(new CANNON.Vec3(1.75,.05,.9))
 const tablebody = new CANNON.Body({mass:0})
-tablebody.addShape(tableGeo,new CANNON.Vec3(0,.02,0));
+tablebody.addShape(tableGeo,new CANNON.Vec3(0,.03,0));
 tablebody.material=defaultMaterial;
 // tablebody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1,0,0),Math.PI *0.5)
 
@@ -460,10 +589,17 @@ const tick = () =>
             
             // console.log(intersects)
             if(singleGroup!=null&&singleSetDisplay==="on"){
-            scene.add(singleGroup)
+            singleGroup.visible=true;
             singleGroup.position.x=intersects[0].point.x
             singleGroup.position.y=.2
             singleGroup.position.z=intersects[0].point.z
+            if(play=="on"){
+            cupbody.position.copy(singleGroup.position)
+            cupbody.quaternion.copy(singleGroup.quaternion)
+            }
+            else{
+                cupbody.position.z = 5
+            }
             }
             // console.log(plate.position)
             
