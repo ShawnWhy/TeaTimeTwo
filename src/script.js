@@ -40,6 +40,7 @@ const createMacaroon = (intersect)=>{
     macaroonBody.position=new CANNON.Vec3(intersect.point.x, .23, intersect.point.z)
     macaroonBody.material=defaultMaterial;
     world.add(macaroonBody)
+    macaroonBody.sleepSpeedLimit = 1.0;
     intersectObjectMacaroon.push({newMacaroonGroup,macaroonBody})
 
 
