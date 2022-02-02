@@ -1,7 +1,7 @@
 
 
 
-    const createSingleSet = function(CANNON, THREE, intersects, defaultMaterial, singleGroup, scene, world, objectsToUpdate){
+    const createSingleSet = function(CANNON, THREE, intersects, defaultMaterial, singleGroup, scene, world, objectsToUpdate,plateArray){
         const cupbow = new CANNON.Cylinder(.155,.1,.13,8)
         const plateDrop = new CANNON.Cylinder(.3,.15,.05,8)
     
@@ -14,6 +14,7 @@
         platebody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1,0,0),Math.PI *0.5)
         cupbody.position=new CANNON.Vec3(intersects[0].point.x, 1, intersects[0].point.z)
         platebody.position=new CANNON.Vec3(intersects[0].point.x, .9, intersects[0].point.z)
+
     
         cupbody.material=defaultMaterial;
         cupbody.addShape(cupbow,new CANNON.Vec3(0,0,0))
@@ -38,7 +39,7 @@
         // console.log(singleGroup)
         cupbody.sleepSpeedLimit = 1.0;
         platebody.sleepSpeedLimit = 1.0;
-
+        plateArray.push(plateMesh)
     
         world.add(platebody)
         scene.add(plateMesh)
@@ -49,7 +50,7 @@
     }
 
 
-    const createSingleSetProper = (CANNON, THREE, intersects, defaultMaterial, singleGroup,scene, world, objectsToUpdate)=>{
+    const createSingleSetProper = (CANNON, THREE, intersects, defaultMaterial, singleGroup,scene, world, objectsToUpdate,plateArray)=>{
 
         const cupbow = new CANNON.Cylinder(.155,.1,.13,8)
         const plateDrop = new CANNON.Cylinder(.3,.15,.05,8)
@@ -82,6 +83,7 @@
         singleFakeCup.add(singleCup)
         const plateMesh = new THREE.Group();
         plateMesh.add(newsingleplate)
+        plateArray.push(newsingleplate)
         // console.log(singleGroup)
         cupbody.sleepSpeedLimit = 1.0;
         platebody.sleepSpeedLimit = 1.0;
@@ -93,6 +95,7 @@
         objectsToUpdate.push({singleFakeCup,cupbody,plateMesh,platebody})
         
     }
+
 
 
 module.exports ={

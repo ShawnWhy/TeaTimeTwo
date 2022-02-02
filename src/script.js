@@ -13,7 +13,39 @@ import {createSingleSet, createSingleSetProper} from './createSingleSet.js'
 
 console.log(createSingleSetProper);
 
+const createMacaroon = (intersect)=>{
+    
+    let random = Math.floor(Math.random()*(macaroonMaterial.length-1))
+    let newMacaroon = macaroon.clone();
+    newMacaroon.children[0].material=macaroonMaterial[random]
+    newMacaroon.children[1].material=macaroonMaterial[random]
+    newMacaroon.children[2].material=macaroonMaterial[random]
+    
+    let newMacaroonGroup = new THREE.Group();
+    newMacaroon.position.x=0;
+    newMacaroon.position.y=0;
+    newMacaroon.position.z=0;
 
+    newMacaroon.rotation.x = Math.PI * 0.5
+    
+    newMacaroonGroup.add(newMacaroon)
+    scene.add(newMacaroonGroup)
+    
+    // const macaroonCin = new THREE.CylinderGeometry(.067,.067,.047,8,3,false,0,Math.PI*2)
+    const macaroonGeo = new CANNON.Cylinder(.067,.067,.047,8)
+    const macaroonBody = new CANNON.Body({mass:.5})
+    macaroonBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1,0,0),Math.PI *0.5)
+
+    macaroonBody.addShape(macaroonGeo,new CANNON.Vec3(0,0,0));
+    macaroonBody.position=new CANNON.Vec3(intersect.point.x, .23, intersect.point.z)
+    macaroonBody.material=defaultMaterial;
+    world.add(macaroonBody)
+    intersectObjectMacaroon.push({newMacaroonGroup,macaroonBody})
+
+
+
+
+}
 // import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 // import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 const about = "<p>Shawn Is a person</p>"
@@ -28,9 +60,8 @@ floorTexture.wrapT = THREE.MirroredRepeatWrapping
 floorTexture.wrapS = THREE.MirroredRepeatWrapping
 
 const floorMaterial = new THREE.MeshBasicMaterial({map:floorTexture})
-var audioCup = new Audio('/mug.wav');
-var audioClick = new Audio('/click.wav');
-audioCup.volume=.5
+var audioPorcelin = new Audio('/mug.wav');
+// audioCup.volume=.5
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 // Scene
@@ -45,6 +76,8 @@ const objectsToUpdate = []
 const sphereGeometry = new THREE.SphereGeometry(1, 8, 8)
 //global variables
 let intersects=null
+let plateIntersects = []
+let intersectObjectMacaroon=[]
 let dance="off"
 let singleSet = null
 let tableCloth = null
@@ -54,6 +87,9 @@ let singleCup= null
 let singlePlate = null
 let singleGroup = null
 let play = "off"
+let macaroon=null
+let macaroonTrigger = "off"
+let plateArray = [];
 
 let cups ={
     1:"",
@@ -72,7 +108,6 @@ let plates ={
     6:"",
 }
 
-
 let teaSetTriggers={
 1:"on",
 2:"on",
@@ -81,8 +116,6 @@ let teaSetTriggers={
 5:"on",
 6:"on",
 }
-
-
 
 let currentTrigger = null 
 
@@ -99,8 +132,15 @@ const quotes = [
 
 ]
 
+let macaroonMaterial = [
 
- const basicTexture = new THREE.MeshBasicMaterial({color:"blue"})
+ new THREE.MeshStandardMaterial({color:"#F3A56B"}),
+ new THREE.MeshStandardMaterial({color:"#7BE8F3"}),
+new THREE.MeshStandardMaterial({color:"#5EF097"}),
+new THREE.MeshStandardMaterial({color:"#EE5E92"}),
+]
+
+
 
 
  const world = new CANNON.World()
@@ -131,7 +171,6 @@ cupbody.addShape(cupHandle,new CANNON.Vec3(.115,0,0))
 cupbody.addShape(plateDrop,new CANNON.Vec3(0,0,0))
 world.addBody(cupbody)
 
-
  //physics floor
 const floorShape = new CANNON.Plane()
 const floorBody = new CANNON.Body()
@@ -148,9 +187,6 @@ world.addBody(floorBody)
     width: window.innerWidth,
     height: window.innerHeight
 }
-
-
-
 const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 10),
  floorMaterial
@@ -160,7 +196,6 @@ floor.rotation.x = - Math.PI * 0.5
 floor.position.y = -.5
 scene.add(floor)
 floor.position.copy(floorBody.position)
-
 
 window.addEventListener('resize', () =>
 {
@@ -187,28 +222,19 @@ window.addEventListener('resize', () =>
         }
 })
 
-
 const initializePlacingProper= function(cup, plate){
     singleSetDisplay="on";
     createSinglesetProperTrigger="on"
     cup.visible=false
 plate.visible=false}
-const placeSingleSetProper = function(number){
 
+const placeSingleSetProper = function(number){
 teaSetTriggers[number]="off"
 singleSetDisplay="off";
 singleGroup.visible=false;
 $(".monitor").removeClass("invisibleP")
 $(".menue").addClass("invisibleP")
-
-// createSinglesetProper()
-
-
 }
-
-
-
-
 
 const mouse = new THREE.Vector2()
 mouse.x = null
@@ -218,8 +244,6 @@ $(".button").click((e)=>{
     console.log("clock")
     e.preventDefault();
     e.stopPropagation();
-    
-
     if(teaSetTriggers[1] ==="off"&&teaSetTriggers[2]==="off"&&teaSetTriggers[3]==="off"&&teaSetTriggers[4]==="off"&&teaSetTriggers[5]==="off"&&teaSetTriggers[6]==="off"){
 
     $(".monitor").removeClass("invisibleP")
@@ -246,13 +270,9 @@ $(".button").click((e)=>{
             case "links":
             $(".display").html(links)
             break;
-    }
-
-  
+    } 
 }
-else{
-
-    
+else{  
     currentTrigger = $(e.target).attr("name")
    
     var ButtonName = $(e.target).attr("name")
@@ -332,16 +352,13 @@ else{
             break;
     }
 }
-
 })
-
 $(".xButton").click((e)=>{
     e.preventDefault();
     e.stopPropagation();
     $(".monitor").addClass("invisibleP")
     $(".menue").removeClass("invisibleP")
 })
-
 $(".play").click((e)=>{  
     $(".stop").removeClass("invisibleP")
     $(".play").addClass("invisibleP")
@@ -352,7 +369,6 @@ $(".play").click((e)=>{
     singleSetDisplay="on"
     teaset.visible=false
     $(".button").addClass("invisibleP")
-
 
 })
 $(".stop").click((e)=>{
@@ -366,15 +382,11 @@ $(".stop").click((e)=>{
     teaset.visible=true
     singleGroup.visible=false
     
+    
     objectsToUpdate.forEach(element => {
         scene.remove(element.plateMesh, element.singleFakeCup);
-        world.remove(element.platebody,element.cupbody)
-        
-        
+        world.remove(element.platebody,element.cupbody)   
     });
-
-
-
 })
 window.addEventListener('mousemove', (event) =>
 {
@@ -391,19 +403,14 @@ window.addEventListener('mousemove', (event) =>
 const gltfLoader = new GLTFLoader()
 // gltfLoader.setDRACOLoader(dracoLoader)
 
-
 gltfLoader.load(
     '/tableandcloth.glb',
     (gltf) =>
     {
         tableCloth=gltf.scene
-        // tableCloth.children[0].material = plateMaterial
-        // tableCloth.children[1].material = plateMaterial
         scene.add(tableCloth)
-  
     }
 )
-
 
 gltfLoader.load(
     '/singleset.glb',
@@ -415,11 +422,30 @@ gltfLoader.load(
         singleCup.position.y+=.07;
         singleGroup=new THREE.Group();
         singleGroup.add(singlePlate,singleCup)
-        singleGroup.visible=false
         scene.add(singleGroup)
-
-       
-  
+        singleGroup.position.y-=.1
+        
+    }
+)
+gltfLoader.load(
+    '/macaroon.glb',
+    (gltf) =>
+    {       
+        macaroon=gltf.scene
+        // macaroon.children[0].material=basicTexture
+        // macaroon.children[1].material=basicTexture
+        // macaroon.children[2].material=basicTexture
+        macaroon.position.y+=1
+        macaroon.scale.x=.07
+        macaroon.scale.y=.07
+        macaroon.scale.z=.07
+        
+        // const macaroonCin = new THREE.CylinderGeometry(.067,.067,.047,8,3,false,0,Math.PI*2)
+        // const macaroonMesh = new THREE.Mesh(macaroonCin, macaroonMaterial[2])
+        // macaroonMesh.position.y+=1;
+        // scene.add(macaroonMesh)
+        
+        
     }
 )
 
@@ -536,10 +562,10 @@ const raycaster = new THREE.Raycaster()
 $(window).click(()=>{
     if(intersects.length>0){
         if(play==="on"){
-        createSingleSet(CANNON, THREE, intersects,defaultMaterial, singleGroup,scene, world, objectsToUpdate)
+        createSingleSet(CANNON, THREE, intersects,defaultMaterial, singleGroup,scene, world, objectsToUpdate,plateArray)
         }
         else if(createSinglesetProperTrigger==="on"){
-        createSingleSetProper(CANNON, THREE, intersects,defaultMaterial, singleGroup,scene, world, objectsToUpdate)
+        createSingleSetProper(CANNON, THREE, intersects,defaultMaterial, singleGroup,scene, world, objectsToUpdate,plateArray)
         createSinglesetProperTrigger="off"
         singleSetDisplay="off"
         singleGroup.visible=false
@@ -550,10 +576,17 @@ $(window).click(()=>{
         }
 
     }
+
+    if(plateIntersects.length>0){
+
+        createMacaroon(plateIntersects[0])
+
+
+    }
   
     
 })
-var clothToTravel = []
+// var clothToTravel = []
 const tableGeo = new CANNON.Box(new CANNON.Vec3(1.75,.05,.9))
 const tablebody = new CANNON.Body({mass:0})
 tablebody.addShape(tableGeo,new CANNON.Vec3(0,.03,0));
@@ -574,6 +607,23 @@ world.add(tablebody)
 // tableGroup.position.copy(tablebody.position)
 // tableGroup.quaternion.copy(tablebody.quaternion)
 // clothToTravel.push(plate)
+const playHitSound = (collision) =>
+{
+    const impactStrength = collision.contact.getImpactVelocityAlongNormal()
+
+    if(impactStrength > .3)
+    {
+        audioPorcelin.volume = Math.random()
+        audioPorcelin.currentTime = 0
+        audioPorcelin.play()
+    }
+}
+cupbody.addEventListener('collide', playHitSound)
+platebody.addEventListener('collide', playHitSound)
+floorBody.addEventListener('collide', playHitSound)
+tablebody.addEventListener('collide', playHitSound)
+
+
 
 
 
@@ -581,7 +631,12 @@ world.add(tablebody)
 const tick = () =>
    
 {raycaster.setFromCamera(mouse, camera)
-
+    if(plateArray.length>0){
+        
+    plateIntersects = raycaster.intersectObjects(plateArray)
+    
+    }
+   
 
     if(tableCloth != null){
         intersects = raycaster.intersectObject(tableCloth.children[0])
@@ -618,6 +673,13 @@ const tick = () =>
         object.plateMesh.position.copy(object.platebody.position)
         object.plateMesh.quaternion.copy(object.platebody.quaternion)
         // object.body.applyForce(new CANNON.Vec3(- 10, 0, 0), object.body.position)
+    }
+
+    for(const macaroon of intersectObjectMacaroon)
+    {
+
+        macaroon.newMacaroonGroup.position.copy(macaroon.macaroonBody.position)
+        macaroon.newMacaroonGroup.quaternion.copy(macaroon.macaroonBody.quaternion)
     }
     if(objectsToUpdate.length>0){
     // console.log(objectsToUpdate)

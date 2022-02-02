@@ -95,8 +95,14 @@ body
 
 .display{
     margin:10px;
-    padding:10px;
-    width:60%;
+    padding:20px;
+    width:80%;
+    border-radius:3px
+}
+
+.display:hover{
+    background-color: white;
+    color:black
 }
 
 .xButton:hover{
